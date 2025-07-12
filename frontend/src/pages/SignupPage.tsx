@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { ApiError } from "@/lib/api";
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -17,14 +20,42 @@ const SignupPage = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { signup } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match!");
+      toast({
+        title: "Error",
+        description: "Passwords don't match!",
+        variant: "destructive",
+      });
       return;
     }
-    console.log("Signup attempt:", formData);
+    
+    setIsLoading(true);
+    
+    try {
+      await signup(formData.name, formData.email, formData.password);
+      toast({
+        title: "Success!",
+        description: "Account created successfully. Welcome!",
+      });
+      navigate("/");
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "Signup failed. Please try again.";
+      toast({
+        title: "Error",
+        description: message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -150,9 +181,11 @@ const SignupPage = () => {
                 type="submit" 
                 variant="warm" 
                 className="w-full relative overflow-hidden group"
-                disabled={!formData.agreeToTerms}
+                disabled={!formData.agreeToTerms || isLoading}
               >
-                <span className="relative z-10">🎉 Create Account</span>
+                <span className="relative z-10">
+                  {isLoading ? "Creating account..." : "🎉 Create Account"}
+                </span>
                 <div className="absolute inset-0 bg-gradient-sunset opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Button>
             </form>
