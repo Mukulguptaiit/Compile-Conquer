@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { ApiError } from "@/lib/api";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -12,10 +15,36 @@ const LoginPage = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const from = location.state?.from?.pathname || "/";
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login attempt:", formData);
+    setIsLoading(true);
+    
+    try {
+      await login(formData.email, formData.password);
+      toast({
+        title: "Success!",
+        description: "You have been logged in successfully.",
+      });
+      navigate(from, { replace: true });
+    } catch (error) {
+      const message = error instanceof ApiError ? error.message : "Login failed. Please try again.";
+      toast({
+        title: "Error",
+        description: message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -88,8 +117,15 @@ const LoginPage = () => {
                 </Link>
               </div>
 
-              <Button type="submit" variant="sunset" className="w-full relative overflow-hidden group">
-                <span className="relative z-10">✨ Sign In</span>
+              <Button 
+                type="submit" 
+                variant="sunset" 
+                className="w-full relative overflow-hidden group"
+                disabled={isLoading}
+              >
+                <span className="relative z-10">
+                  {isLoading ? "Signing in..." : "✨ Sign In"}
+                </span>
                 <div className="absolute inset-0 bg-gradient-warm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Button>
             </form>
