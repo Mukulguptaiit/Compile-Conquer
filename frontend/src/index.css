@@ -2,53 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-/* StackIt Design System - Professional Q&A Platform */
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
 
 @layer base {
   :root {
-    /* Modern blue-gray palette for professional look */
-    --background: 0 0% 100%;
-    --foreground: 215 25% 27%;
+    --background: 30 100% 99%;
+    --foreground: 24 100% 8%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 27%;
+    --card: 35 100% 98%;
+    --card-foreground: 24 100% 8%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
+    --popover: 35 100% 98%;
+    --popover-foreground: 24 100% 8%;
 
-    /* Primary: Modern blue for actions and links */
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 98%;
-    --primary-hover: 217 91% 55%;
+    --primary: 28 100% 55%;
+    --primary-foreground: 35 100% 98%;
+    --primary-glow: 32 100% 65%;
 
-    /* Secondary: Light gray for subtle elements */
-    --secondary: 214 32% 91%;
-    --secondary-foreground: 215 25% 27%;
+    --secondary: 35 50% 95%;
+    --secondary-foreground: 24 70% 15%;
 
-    /* Muted: Even lighter for backgrounds */
-    --muted: 210 40% 98%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 35 50% 95%;
+    --muted-foreground: 30 20% 50%;
 
-    /* Accent: Slight blue tint for highlights */
-    --accent: 214 32% 91%;
-    --accent-foreground: 215 25% 27%;
+    --accent: 32 80% 90%;
+    --accent-foreground: 28 100% 25%;
 
-    /* Destructive: Modern red for warnings */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-    /* Success: Green for positive actions */
     --success: 142 76% 36%;
-    --success-foreground: 0 0% 98%;
+    --success-foreground: 355.7 100% 97.3%;
 
-    /* Warning: Orange for caution */
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 98%;
+    --warning: 45 100% 55%;
+    --warning-foreground: 48 96% 89%;
 
-    /* Borders and inputs */
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 217 91% 60%;
+    --border: 35 30% 88%;
+    --input: 35 30% 88%;
+    --ring: 28 100% 55%;
+
+    /* Custom design tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(28 100% 55%), hsl(32 100% 65%));
+    --gradient-secondary: linear-gradient(135deg, hsl(35 100% 98%), hsl(32 80% 90%));
+    --gradient-warm: linear-gradient(135deg, hsl(20 100% 60%), hsl(35 100% 65%));
+    --gradient-sunset: linear-gradient(135deg, hsl(15 100% 65%), hsl(25 100% 70%));
+    --shadow-elegant: 0 10px 30px -10px hsl(28 100% 55% / 0.3);
+    --shadow-soft: 0 4px 20px -8px hsl(28 100% 55% / 0.2);
+    --shadow-warm: 0 8px 25px -8px hsl(20 100% 60% / 0.25);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Vote colors */
+    --vote-up: 142 76% 36%;
+    --vote-down: 0 84% 60%;
+    --vote-neutral: 30 20% 50%;
 
     --radius: 0.5rem;
 
@@ -70,33 +78,33 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 24 100% 4%;
+    --foreground: 35 100% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 24 100% 6%;
+    --card-foreground: 35 100% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 24 100% 6%;
+    --popover-foreground: 35 100% 95%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 32 100% 65%;
+    --primary-foreground: 24 100% 8%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 28 30% 15%;
+    --secondary-foreground: 35 100% 95%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 28 30% 15%;
+    --muted-foreground: 30 40% 70%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 28 50% 20%;
+    --accent-foreground: 35 100% 95%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 35 100% 95%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 28 30% 18%;
+    --input: 28 30% 18%;
+    --ring: 32 100% 65%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -114,51 +122,6 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
-  }
-
-  /* StackIt specific styling */
-  .stackit-question-card {
-    @apply bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow duration-200;
-  }
-
-  .stackit-vote-button {
-    @apply flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all duration-200;
-  }
-
-  .stackit-vote-button.upvote {
-    @apply border-success text-success hover:bg-success hover:text-success-foreground;
-  }
-
-  .stackit-vote-button.downvote {
-    @apply border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground;
-  }
-
-  .stackit-tag {
-    @apply inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-accent text-accent-foreground border border-border;
-  }
-
-  .stackit-nav-link {
-    @apply px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 hover:bg-accent hover:text-accent-foreground;
-  }
-
-  .stackit-nav-link.active {
-    @apply bg-primary text-primary-foreground;
-  }
-
-  /* Smooth animations */
-  .stackit-fade-in {
-    animation: stackit-fade-in 0.3s ease-out;
-  }
-
-  @keyframes stackit-fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    @apply bg-background text-foreground;
   }
 }
