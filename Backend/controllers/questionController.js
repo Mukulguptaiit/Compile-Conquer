@@ -113,3 +113,117 @@ export const markQuestionAsResolved = async (req, res) => {
   }
 };
 
+
+export const voteQuestion = async (req, res) => {
+  const { id } = req.params; // questionId
+  const { value } = req.body; // 1 for upvote, -1 for downvote
+  const userId = req.user.userId;
+
+  if (![1, -1].includes(value)) {
+    return res.status(400).json({ message: 'Vote must be 1 or -1' });
+  }
+
+  try {
+    const question = await Question.findByPk(id);
+    if (!question) return res.status(404).json({ message: 'Question not found' });
+
+    const existingVote = await VoteQuestion.findOne({
+      where: { questionId: id, userId }
+    });
+
+    if (!existingVote) {
+      await VoteQuestion.create({ questionId: id, userId, value });
+      value === 1 ? question.upvotes++ : question.downvotes++;
+    } else {
+      if (existingVote.value === value) {
+        // Remove vote
+        await existingVote.destroy();
+        value === 1 ? question.upvotes-- : question.downvotes--;
+      } else {
+        // Flip vote
+        existingVote.value = value;
+        await existingVote.save();
+        if (value === 1) {
+          question.upvotes++;
+          question.downvotes--;
+        } else {
+          question.upvotes--;
+          question.downvotes++;
+        }
+      }
+    }
+
+    await question.save();
+    res.status(200).json({ message: 'Vote recorded', upvotes: question.upvotes, downvotes: question.downvotes });
+
+  } catch (err) {
+    res.status(500).json({ message: 'Voting failed', error: err.message });
+  }
+};
+
+export const getQuestionById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const question = await db.models.Question.findByPk(id, {
+      include: [
+        {
+          model: db.models.User,
+          attributes: ['id', 'username']
+        },
+        {
+          model: db.models.Tag,
+          through: { attributes: [] },
+          attributes: ['name']
+        },
+        {
+          model: db.models.Answer,
+          as: 'answers',
+          include: [
+            {
+              model: db.models.User,
+              attributes: ['id', 'username']
+            },
+            {
+              model: db.models.VoteAnswer,
+              attributes: ['userId', 'value']
+            }
+          ]
+        }
+      ],
+      order: [[{ model: db.models.Answer, as: 'answers' }, 'createdAt', 'ASC']]
+    });
+
+    if (!question) {
+      return res.status(404).json({ message: 'Question not found' });
+    }
+
+    const formattedAnswers = question.answers.map(answer => ({
+      id: answer.id,
+      content: answer.content,
+      createdAt: answer.createdAt,
+      updatedAt: answer.updatedAt,
+      user: answer.User,
+      voteCount: answer.VoteAnswers?.reduce((acc, v) => acc + v.value, 0) || 0
+    }));
+
+    res.status(200).json({
+      question: {
+        id: question.id,
+        title: question.title,
+        description: question.description,
+        user: question.User,
+        tags: question.Tags.map(tag => tag.name),
+        createdAt: question.createdAt,
+        updatedAt: question.updatedAt,
+        resolved: question.resolved,
+        upvotes: question.upvotes,
+        downvotes: question.downvotes
+      },
+      answers: formattedAnswers
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch question', error: err.message });
+  }
+};

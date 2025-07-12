@@ -21,6 +21,16 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
+    },
+    upvotes: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
+    downvotes: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     }
   });
 
@@ -34,6 +44,12 @@ export default (sequelize, DataTypes) => {
       through: 'QuestionTag',
       foreignKey: 'questionId',
       otherKey: 'tagId'
+    });
+
+    Question.hasMany(models.Answer, {
+      foreignKey: 'questionId',
+      as: 'answers',
+      onDelete: 'CASCADE'
     });
   };
 

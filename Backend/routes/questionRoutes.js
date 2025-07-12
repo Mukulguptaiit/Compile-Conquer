@@ -1,17 +1,21 @@
 import express from 'express';
-import authMiddleware from '../middleware/authMiddleware.js';
 import {
   postQuestion,
   deleteQuestion,
   updateQuestion,
-  markQuestionAsResolved
+  markQuestionAsResolved,
+  voteQuestion,
+  getQuestionById
 } from '../controllers/questionController.js';
-
+import authMiddleware  from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 router.post('/', authMiddleware, postQuestion);
+router.patch('/:id', authMiddleware, updateQuestion);
 router.delete('/:id', authMiddleware, deleteQuestion);
-router.put('/:id', authMiddleware, updateQuestion);
 router.patch('/:id/resolve', authMiddleware, markQuestionAsResolved);
+router.post('/:id/vote',authMiddleware, voteQuestion); 
+router.get('/get/:id', authMiddleware, getQuestionById);
+
 
 export default router;
