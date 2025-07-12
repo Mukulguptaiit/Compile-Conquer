@@ -134,7 +134,7 @@ const QuestionsPage = () => {
                   <h1 className="text-2xl font-bold">All Questions</h1>
                   <p className="text-muted-foreground">{MOCK_QUESTIONS.length} questions</p>
                 </div>
-                <Button asChild variant="sunset" className="animate-bounce hover:animate-none">
+                <Button asChild variant="sunset">
                   <Link to="/ask">
                     <Plus className="w-4 h-4" />
                     🔥 Ask Question
