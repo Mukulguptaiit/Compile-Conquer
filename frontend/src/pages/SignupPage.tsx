@@ -180,13 +180,10 @@ const SignupPage = () => {
               <Button 
                 type="submit" 
                 variant="warm" 
-                className="w-full relative overflow-hidden group"
+                className="w-full"
                 disabled={!formData.agreeToTerms || isLoading}
               >
-                <span className="relative z-10">
-                  {isLoading ? "Creating account..." : "🎉 Create Account"}
-                </span>
-                <div className="absolute inset-0 bg-gradient-sunset opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                {isLoading ? "Creating account..." : "🎉 Create Account"}
               </Button>
             </form>
 

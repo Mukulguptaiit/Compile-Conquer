@@ -26,16 +26,19 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Login attempt with:', { email: formData.email, password: formData.password });
     setIsLoading(true);
     
     try {
       await login(formData.email, formData.password);
+      console.log('Login successful');
       toast({
         title: "Success!",
         description: "You have been logged in successfully.",
       });
       navigate(from, { replace: true });
     } catch (error) {
+      console.error('Login error:', error);
       const message = error instanceof ApiError ? error.message : "Login failed. Please try again.";
       toast({
         title: "Error",
@@ -120,13 +123,10 @@ const LoginPage = () => {
               <Button 
                 type="submit" 
                 variant="sunset" 
-                className="w-full relative overflow-hidden group"
+                className="w-full"
                 disabled={isLoading}
               >
-                <span className="relative z-10">
-                  {isLoading ? "Signing in..." : "✨ Sign In"}
-                </span>
-                <div className="absolute inset-0 bg-gradient-warm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                {isLoading ? "Signing in..." : "✨ Sign In"}
               </Button>
             </form>
 
