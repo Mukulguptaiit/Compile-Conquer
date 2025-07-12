@@ -8,21 +8,40 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { TagSelector } from "@/components/questions/TagSelector";
 import { Header } from "@/components/layout/Header";
+import { postQuestion } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 const AskQuestionPage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     tags: [] as string[],
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.title.trim() && formData.description.trim() && formData.tags.length > 0) {
-      // Handle form submission
-      console.log("Submitting question:", formData);
+    setLoading(true);
+    setError(null);
+    try {
+      await postQuestion(formData);
+      toast({
+        title: "Question posted!",
+        description: "Your question has been posted successfully.",
+      });
       navigate("/");
+    } catch (err: any) {
+      setError(err.message || "Failed to post question");
+      toast({
+        title: "Error",
+        description: err.message || "Failed to post question.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -123,6 +142,9 @@ const AskQuestionPage = () => {
                   placeholder="Add up to 5 tags to describe what your question is about"
                 />
 
+                {/* Error */}
+                {error && <div className="text-destructive text-sm">{error}</div>}
+
                 {/* Submit Button */}
                 <div className="flex items-center justify-between pt-6 border-t">
                   <p className="text-sm text-muted-foreground">
@@ -131,10 +153,9 @@ const AskQuestionPage = () => {
                  <Button 
                     type="submit" 
                     variant="warm"
-                    disabled={!formData.title.trim() || !formData.description.trim() || formData.tags.length === 0}
-                    className="animate-pulse hover:animate-none"
+                    disabled={loading || !formData.title.trim() || !formData.description.trim() || formData.tags.length === 0}
                   >
-                    🚀 Post Your Question
+                    {loading ? "Posting..." : "🚀 Post Your Question"}
                   </Button>
                 </div>
               </form>

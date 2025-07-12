@@ -122,4 +122,28 @@ export const authApi = {
   },
 };
 
+export async function fetchQuestions(params: Record<string, any> = {}) {
+  const query = new URLSearchParams(params as any).toString();
+  const res = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/questions/all?${query}`);
+  if (!res.ok) throw new Error('Failed to fetch questions');
+  return res.json();
+}
+
+// If/when the backend adds a tags endpoint, use this:
+export async function fetchTags() {
+  const res = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/tags/all`);
+  if (!res.ok) throw new Error('Failed to fetch tags');
+  return res.json();
+}
+
+export async function postQuestion(data: { title: string; description: string; tags: string[] }) {
+  return makeRequest<{ message: string; question: any; tags: string[] }>(
+    '/questions/',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }
+  );
+}
+
 export { ApiError, getAuthToken, setAuthToken, removeAuthToken }; 

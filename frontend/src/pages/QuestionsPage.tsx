@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Search, Filter, SortAsc, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Search, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,56 +13,43 @@ import {
 } from "@/components/ui/select";
 import { QuestionCard } from "@/components/questions/QuestionCard";
 import { Header } from "@/components/layout/Header";
-
-const MOCK_QUESTIONS = [
-  {
-    id: "1",
-    title: "How to join 2 columns in a data set to make a separate column in SQL",
-    description: "I'm trying to combine two columns in a SQL database to create a new column. What's the best way to do this with a SQL query?",
-    author: { name: "Alex Turner" },
-    votes: 12,
-    answers: 3,
-    tags: ["SQL", "Database", "Data"],
-    createdAt: "2 hours ago",
-    hasAcceptedAnswer: true,
-  },
-  {
-    id: "2", 
-    title: "Understanding Recursive Functions in Python",
-    description: "Can someone provide a simple example and explanation of how to implement recursive functions in Python? I'm struggling with the concept of a base case.",
-    author: { name: "Sarah Johnson" },
-    votes: 8,
-    answers: 2,
-    tags: ["Python", "Recursion", "Programming"],
-    createdAt: "4 hours ago",
-  },
-  {
-    id: "3",
-    title: "Implementing User Authentication with JWT in React and Node.js",
-    description: "I'm looking to implement user authentication using JWT. What's the best way to handle user authentication in both the frontend (React) and backend (Node.js)?",
-    author: { name: "Mike Chen" },
-    votes: 15,
-    answers: 5,
-    tags: ["React", "Node.js", "JWT", "Authentication"],
-    createdAt: "6 hours ago",
-    hasAcceptedAnswer: true,
-  },
-  {
-    id: "4",
-    title: "Choosing the Right Machine Learning Algorithm for Classification",
-    description: "I have a dataset with 10,000 rows and need to choose the right algorithm for a classification task. I have a decision with logistic regression and SVM but can't decide which one.",
-    author: { name: "David Kim" },
-    votes: 10,
-    answers: 4,
-    tags: ["Machine Learning", "Classification", "Python", "Algorithm"],
-    createdAt: "1 day ago",
-  },
-];
+import { fetchQuestions } from "@/lib/api";
 
 const QuestionsPage = () => {
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [filterBy, setFilterBy] = useState("all");
+  // Placeholder for tags, update when tags endpoint is available
+  const [tags] = useState<string[]>(["React", "JavaScript", "Python", "SQL", "Node.js"]);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    fetchQuestions({ search: searchQuery, sort: sortBy, filter: filterBy })
+      .then((data) => {
+        // Transform backend questions to match QuestionCard props
+        const mappedQuestions = (data.questions || []).map((q: any) => ({
+          id: q.id,
+          title: q.title,
+          description: q.description,
+          author: {
+            name: q.User?.name || 'Unknown',
+            avatar: q.User?.avatar || undefined,
+          },
+          votes: (q.upvotes || 0) - (q.downvotes || 0),
+          answers: Array.isArray(q.answers) ? q.answers.length : (q.answers || 0),
+          tags: Array.isArray(q.Tags) ? q.Tags.map((t: any) => t.name) : (q.tags || []),
+          createdAt: q.createdAt ? new Date(q.createdAt).toLocaleDateString() : '',
+          hasAcceptedAnswer: q.hasAcceptedAnswer || false,
+        }));
+        setQuestions(mappedQuestions);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [searchQuery, sortBy, filterBy]);
 
   return (
     <div className="min-h-screen bg-gradient-secondary relative">
@@ -116,7 +103,7 @@ const QuestionsPage = () => {
             <div className="space-y-3">
               <h3 className="font-medium">Popular Tags</h3>
               <div className="flex flex-wrap gap-2">
-                {["React", "JavaScript", "Python", "SQL", "Node.js"].map((tag) => (
+                {tags.map((tag) => (
                   <Badge key={tag} variant="outline" className="cursor-pointer hover:bg-accent">
                     {tag}
                   </Badge>
@@ -132,7 +119,7 @@ const QuestionsPage = () => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   <h1 className="text-2xl font-bold">All Questions</h1>
-                  <p className="text-muted-foreground">{MOCK_QUESTIONS.length} questions</p>
+                  <p className="text-muted-foreground">{questions.length} questions</p>
                 </div>
                 <Button asChild variant="sunset">
                   <Link to="/ask">
@@ -154,20 +141,21 @@ const QuestionsPage = () => {
               </div>
 
               {/* Questions List */}
-              <div className="space-y-4">
-                {MOCK_QUESTIONS.map((question) => (
-                  <QuestionCard key={question.id} question={question} />
-                ))}
-              </div>
+              {loading ? (
+                <div className="text-center py-8 text-muted-foreground">Loading questions...</div>
+              ) : error ? (
+                <div className="text-center py-8 text-destructive">{error}</div>
+              ) : questions.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">No questions found.</div>
+              ) : (
+                <div className="space-y-4">
+                  {questions.map((question) => (
+                    <QuestionCard key={question.id} question={question} />
+                  ))}
+                </div>
+              )}
 
-              {/* Pagination */}
-              <div className="flex justify-center space-x-2 pt-8">
-                {[1, 2, 3, 4, 5].map((page) => (
-                  <Button key={page} variant={page === 1 ? "default" : "outline"} size="sm">
-                    {page}
-                  </Button>
-                ))}
-              </div>
+              {/* Pagination (optional, not implemented here) */}
             </div>
           </main>
         </div>
