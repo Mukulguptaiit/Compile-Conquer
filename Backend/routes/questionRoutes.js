@@ -5,7 +5,8 @@ import {
   updateQuestion,
   markQuestionAsResolved,
   voteQuestion,
-  getQuestionById
+  getQuestionById,
+  getQuestions
 } from '../controllers/questionController.js';
 import authMiddleware  from '../middleware/authMiddleware.js';
 const router = express.Router();
@@ -16,6 +17,7 @@ router.delete('/:id', authMiddleware, deleteQuestion);
 router.patch('/:id/resolve', authMiddleware, markQuestionAsResolved);
 router.post('/:id/vote',authMiddleware, voteQuestion); 
 router.get('/get/:id', authMiddleware, getQuestionById);
+router.get('/questions', getQuestions);
 
 
 export default router;

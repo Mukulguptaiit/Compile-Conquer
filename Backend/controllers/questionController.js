@@ -227,3 +227,85 @@ export const getQuestionById = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch question', error: err.message });
   }
 };
+
+export const getQuestions = async (req, res) => {
+  try {
+    const { search, sort, filter, tags, page = 1, limit = 10 } = req.query;
+
+    const where = {};
+
+    // 🔍 Search (title + description)
+    if (search) {
+      where[Op.or] = [
+        { title: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    // ✅ Filters
+    if (filter === 'answered') {
+      where.answers = { [Op.gt]: 0 };
+    } else if (filter === 'unanswered') {
+      where.answers = 0;
+    } else if (filter === 'accepted') {
+      where.hasAcceptedAnswer = true;
+    }
+
+    // 🧮 Sorting
+    let order = [['createdAt', 'DESC']];
+    if (sort === 'oldest') order = [['createdAt', 'ASC']];
+    else if (sort === 'most-votes') order = [['upvotes', 'DESC']];
+    else if (sort === 'most-answers') order = [['answers', 'DESC']];
+
+    // 🏷️ Include and filter tags
+    const include = [
+      {
+        model: db.User,
+        attributes: ['id', 'name'],
+      },
+      {
+        model: db.Tag,
+        attributes: ['name'],
+        through: { attributes: [] },
+      },
+    ];
+
+    if (tags) {
+      const tagList = tags.split(',');
+      include.push({
+        model: db.Tag,
+        where: { name: { [Op.in]: tagList } },
+        through: { attributes: [] },
+        required: true,
+        attributes: [],
+      });
+    }
+
+    // 🧾 Pagination
+    const pageNum = parseInt(page);
+    const pageSize = parseInt(limit);
+    const offset = (pageNum - 1) * pageSize;
+
+    const { count, rows: questions } = await db.Question.findAndCountAll({
+      where,
+      include,
+      order,
+      limit: pageSize,
+      offset,
+      distinct: true // important for correct count with many-to-many joins
+    });
+
+    res.status(200).json({
+      questions,
+      meta: {
+        total: count,
+        page: pageNum,
+        limit: pageSize,
+        totalPages: Math.ceil(count / pageSize),
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to fetch questions', error: error.message });
+  }
+};
