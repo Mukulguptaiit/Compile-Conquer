@@ -58,17 +58,27 @@ const makeRequest = async <T>(
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const fullUrl = `${API_BASE_URL}${endpoint}`;
+  console.log('Making API request to:', fullUrl);
+  console.log('Request options:', { method: options.method, headers, body: options.body });
+
+  const response = await fetch(fullUrl, {
     ...options,
     headers,
   });
 
+  console.log('Response status:', response.status);
+  console.log('Response headers:', response.headers);
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ message: 'An error occurred' }));
+    console.error('API Error:', errorData);
     throw new ApiError(response.status, errorData.message || 'Request failed');
   }
 
-  return response.json();
+  const data = await response.json();
+  console.log('API Response:', data);
+  return data;
 };
 
 export const authApi = {
