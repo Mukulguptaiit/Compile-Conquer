@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import db from '../models/index.js';
+import db from '../Backend/models/index.js';
 import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
