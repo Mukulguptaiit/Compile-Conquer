@@ -30,12 +30,12 @@ export const registerUser = async (req, res) => {
     res.status(500).json({ message: 'Registration failed', error: err.message });
   }
 };
-
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ where: { email } });
+    const user = await User.scope('withPassword').findOne({ where: { email } });
+
     if (!user || !(await user.validatePassword(password))) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }

@@ -17,7 +17,7 @@ router.delete('/:id', authMiddleware, deleteQuestion);
 router.patch('/:id/resolve', authMiddleware, markQuestionAsResolved);
 router.post('/:id/vote',authMiddleware, voteQuestion); 
 router.get('/get/:id', authMiddleware, getQuestionById);
-router.get('/questions', getQuestions);
+router.get('/all', getQuestions);
 
 
 export default router;
