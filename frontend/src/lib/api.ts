@@ -146,4 +146,68 @@ export async function postQuestion(data: { title: string; description: string; t
   );
 }
 
+export async function getQuestionById(id: string) {
+  return makeRequest<{
+    question: {
+      id: string;
+      title: string;
+      description: string;
+      user: { id: string; username: string };
+      tags: string[];
+      createdAt: string;
+      updatedAt: string;
+      resolved: boolean;
+      upvotes: number;
+      downvotes: number;
+    };
+    answers: Array<{
+      id: string;
+      content: string;
+      createdAt: string;
+      updatedAt: string;
+      user: { id: string; username: string };
+      voteCount: number;
+    }>;
+  }>(`/questions/get/${id}`);
+}
+
+export async function voteQuestion(questionId: string, value: 1 | -1) {
+  return makeRequest<{ message: string; upvotes: number; downvotes: number }>(
+    `/questions/${questionId}/vote`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ value }),
+    }
+  );
+}
+
+export async function postAnswer(questionId: string, content: string) {
+  return makeRequest<{ message: string; answer: any }>(
+    `/answers/${questionId}`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    }
+  );
+}
+
+export async function voteAnswer(answerId: string, value: 1 | -1) {
+  return makeRequest<{ message: string; voteCount: number }>(
+    `/answers/vote/${answerId}`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ value }),
+    }
+  );
+}
+
+export async function acceptAnswer(answerId: string) {
+  return makeRequest<{ message: string }>(
+    `/answers/accept/${answerId}`,
+    {
+      method: 'POST',
+    }
+  );
+}
+
 export { ApiError, getAuthToken, setAuthToken, removeAuthToken }; 

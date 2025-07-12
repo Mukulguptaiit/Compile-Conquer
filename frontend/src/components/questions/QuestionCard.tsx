@@ -24,6 +24,13 @@ interface QuestionCardProps {
 }
 
 export function QuestionCard({ question }: QuestionCardProps) {
+  // Function to strip HTML tags for display
+  const stripHtml = (html: string) => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
+
   return (
     <Card className="hover:shadow-soft transition-all duration-200 hover:border-primary/20">
       <CardContent className="p-6">
@@ -51,9 +58,11 @@ export function QuestionCard({ question }: QuestionCardProps) {
               >
                 {question.title}
               </Link>
-              <p className="text-muted-foreground mt-1 line-clamp-2">
-                {question.description}
-              </p>
+              <div 
+                className="text-muted-foreground mt-1 line-clamp-2 prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: question.description }}
+                title={stripHtml(question.description)}
+              />
             </div>
 
             {/* Tags */}

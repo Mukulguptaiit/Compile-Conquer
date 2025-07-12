@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Bold, Italic, List, Link2, Image, AlignLeft, AlignCenter, AlignRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { TagSelector } from "@/components/questions/TagSelector";
 import { Header } from "@/components/layout/Header";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { postQuestion } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,6 +21,13 @@ const AskQuestionPage = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Function to strip HTML tags for validation
+  const stripHtml = (html: string) => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,43 +99,11 @@ const AskQuestionPage = () => {
                 <div className="space-y-2">
                   <Label htmlFor="description">Body</Label>
                   
-                  {/* Rich Text Toolbar */}
-                  <div className="flex flex-wrap gap-1 p-2 border rounded-md bg-muted/50">
-                    <Button type="button" variant="ghost" size="sm">
-                      <Bold className="w-4 h-4" />
-                    </Button>
-                    <Button type="button" variant="ghost" size="sm">
-                      <Italic className="w-4 h-4" />
-                    </Button>
-                    <div className="w-px h-6 bg-border mx-1" />
-                    <Button type="button" variant="ghost" size="sm">
-                      <List className="w-4 h-4" />
-                    </Button>
-                    <Button type="button" variant="ghost" size="sm">
-                      <Link2 className="w-4 h-4" />
-                    </Button>
-                    <Button type="button" variant="ghost" size="sm">
-                      <Image className="w-4 h-4" />
-                    </Button>
-                    <div className="w-px h-6 bg-border mx-1" />
-                    <Button type="button" variant="ghost" size="sm">
-                      <AlignLeft className="w-4 h-4" />
-                    </Button>
-                    <Button type="button" variant="ghost" size="sm">
-                      <AlignCenter className="w-4 h-4" />
-                    </Button>
-                    <Button type="button" variant="ghost" size="sm">
-                      <AlignRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-
-                  <Textarea
-                    id="description"
-                    placeholder="Include all the information someone would need to answer your question"
+                  <RichTextEditor
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="min-h-[300px]"
-                    required
+                    onChange={(value) => setFormData({ ...formData, description: value })}
+                    placeholder="Include all the information someone would need to answer your question"
+                    minHeight="300px"
                   />
                   <p className="text-xs text-muted-foreground">
                     Describe your problem in detail. Include what you've tried and what you expected to happen.
@@ -153,7 +128,7 @@ const AskQuestionPage = () => {
                  <Button 
                     type="submit" 
                     variant="warm"
-                    disabled={loading || !formData.title.trim() || !formData.description.trim() || formData.tags.length === 0}
+                    disabled={loading || !formData.title.trim() || !stripHtml(formData.description).trim() || formData.tags.length === 0}
                   >
                     {loading ? "Posting..." : "🚀 Post Your Question"}
                   </Button>

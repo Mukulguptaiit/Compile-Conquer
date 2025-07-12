@@ -125,3 +125,72 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Rich Text Editor Styles */
+  .rich-text-editor [contenteditable] {
+    @apply min-h-[300px] p-4 outline-none;
+  }
+
+  .rich-text-editor [contenteditable]:empty:before {
+    content: attr(data-placeholder);
+    @apply text-muted-foreground pointer-events-none;
+  }
+
+  .rich-text-editor [contenteditable]:focus {
+    @apply ring-2 ring-primary ring-offset-2;
+  }
+
+  /* Prose Styles for Rich Text Content */
+  .prose {
+    @apply text-foreground;
+  }
+
+  .prose strong {
+    @apply font-semibold text-foreground;
+  }
+
+  .prose em {
+    @apply italic text-foreground;
+  }
+
+  .prose code {
+    @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground;
+  }
+
+  .prose pre {
+    @apply bg-muted p-4 rounded-lg overflow-x-auto;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0;
+  }
+
+  .prose ul {
+    @apply list-disc list-inside space-y-1;
+  }
+
+  .prose ol {
+    @apply list-decimal list-inside space-y-1;
+  }
+
+  .prose a {
+    @apply text-primary hover:text-primary/80 underline;
+  }
+
+  .prose img {
+    @apply rounded-lg max-w-full h-auto;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-primary/20 pl-4 italic text-muted-foreground;
+  }
+
+  /* Line clamp utility for question descriptions */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
